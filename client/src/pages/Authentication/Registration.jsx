@@ -1,19 +1,13 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
+import { googleSignIn } from "../../utilities/googleSignIn";
 
 const Registration = () => {
   const { authGoogleSignIn, authCreateUser, authUpdateProfile } =
     useContext(AuthContext);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const userCredential = await authGoogleSignIn();
-      console.log("signed in user", userCredential);
-    } catch (error) {
-      console.error("Google Sign-in Failed:", error);
-    }
-  };
+  const handleGoogleSignIn = () => googleSignIn(authGoogleSignIn);
 
   const handleEmailSignUp = async (e) => {
     e.preventDefault();

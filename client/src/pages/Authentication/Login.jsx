@@ -1,12 +1,15 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
+import { googleSignIn } from "../../utilities/googleSignIn";
 
 const Login = () => {
-  const { authSignInUser } = useContext(AuthContext);
+  const { authGoogleSignIn, authSignInUser } = useContext(AuthContext);
 
   // const form = useForm();
   // const { register, control, handleSubmit } = form;
+
+  const hangleGoogleSignIn = () => googleSignIn(authGoogleSignIn);
 
   const handleLoginIn = async (e) => {
     e.preventDefault();
@@ -49,7 +52,10 @@ const Login = () => {
             </p>
 
             {/* sign in with Google button */}
-            <div className="flex cursor-pointer items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg   hover:bg-gray-50 ">
+            <div
+              onClick={hangleGoogleSignIn}
+              className="flex cursor-pointer items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg   hover:bg-gray-50 "
+            >
               <div className="px-4 py-2">
                 <svg className="w-6 h-6" viewBox="0 0 40 40">
                   <path

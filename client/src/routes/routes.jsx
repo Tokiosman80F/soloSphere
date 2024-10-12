@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Main from "../layouts/Main";
 import Login from "../pages/Authentication/Login";
 import Registration from "../pages/Authentication/Registration";
+import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
 import JobDetails from "../pages/JobDetail";
 
@@ -9,6 +10,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <Main />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
