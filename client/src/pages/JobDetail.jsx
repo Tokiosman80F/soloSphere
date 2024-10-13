@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useContext, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -5,7 +6,7 @@ import { useLoaderData } from "react-router-dom";
 import { AuthContext } from "../provider/AuthProvider";
 
 const JobDetails = () => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date().toLocaleDateString());
   const { user } = useContext(AuthContext);
   const job = useLoaderData();
   const {
@@ -19,28 +20,44 @@ const JobDetails = () => {
     buyer_email,
   } = job;
 
-  const handleBidFormSubmission = (e) => {
+  const handleBidFormSubmission = async (e) => {
     e.preventDefault();
+    if (user?.email === buyer_email) return alert("Access Denied");
     const form = e.target;
-    const jobId = _id;
-    const price = parseFloat(form.price.value);
-    const comment = form.comment.value;
+    const job_id = _id;
+    const user_price = parseFloat(form.price.value);
+    if (
+      user_price < parseFloat(min_price) ||
+      user_price <= 0 ||
+      user_price > parseFloat(max_price)
+    ) {
+      return alert("Invalid Pricing");
+    }
+    const user_comment = form.comment.value;
     const user_email = user?.email;
     const status = "Pending";
     const user_deadline = startDate;
     const bidData = {
-      jobId,
-      price,
-      deadline,
-      comment,
+      job_id,
+      user_price,
+      user_deadline,
+      user_comment,
       job_title,
       category,
       user_email,
       buyer_email,
       status,
-      user_deadline,
     };
     console.log(bidData);
+
+    try {
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/bids`,
+        bidData
+      );
+    } catch (error) {
+      console.log("Error in placing bid", error);
+    }
   };
   return (
     <div className="flex flex-col md:flex-row justify-around gap-5  items-center min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto ">

@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Main from "../layouts/Main";
+import AddJob from "../pages/AddJob";
 import Login from "../pages/Authentication/Login";
 import Registration from "../pages/Authentication/Registration";
 import ErrorPage from "../pages/ErrorPage";
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
         element: <JobDetails />,
         loader: ({ params }) =>
           fetch(`${import.meta.env.VITE_API_URL}/job/${params.id}`),
+      },
+      {
+        path: "/add-job",
+        element: <AddJob />,
       },
     ],
   },
