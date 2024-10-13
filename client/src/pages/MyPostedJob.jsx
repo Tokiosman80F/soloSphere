@@ -117,7 +117,8 @@ const MyPostedJobs = () => {
                         title=""
                         className="px-4 py-4 text-sm text-gray-500  whitespace-nowrap"
                       >
-                        {job.description}
+                        {job.description.split(" ").slice(0, 5).join(" ") +
+                          "..."}
                       </td>
                       <td className="px-4 py-4 text-sm whitespace-nowrap">
                         <div className="flex items-center gap-x-6">
