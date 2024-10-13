@@ -12,13 +12,13 @@ const jobSchema = Joi.object({
   job_title: Joi.string().required(),
   description: Joi.string().required(),
   category: Joi.string().required(),
-  max_price: Joi.number().required(),
-  min_price: Joi.number().required(),
-  deadline: Joi.date().required(),
+  max_price: Joi.number().required().min(0), // Ensure max_price is a positive number
+  min_price: Joi.number().required().min(0).less(Joi.ref("max_price")), // min_price should be less than or equal to max_price
+  deadline: Joi.date().required(), // Validate that the deadline is a valid date
   buyer: Joi.object({
     email: Joi.string().email().required(),
     name: Joi.string().required(),
-    photo: Joi.string().uri(),
+    photo: Joi.string().uri().optional(), // Photo is optional, but must be a valid URI if provided
   }).required(),
 });
 
@@ -59,6 +59,7 @@ async function run() {
         res.status(500).send({ message: "Failed tp fetch job" });
       }
     });
+
     // Route: Get a Signle Job by ID
     app.get("/job/:id", async (req, res) => {
       try {
@@ -74,6 +75,7 @@ async function run() {
         res.status(500).send({ message: "Faild to fetch job" });
       }
     });
+
     // Route: Save a Bid
     app.post("/bids", async (req, res) => {
       try {
@@ -90,17 +92,34 @@ async function run() {
     app.post("/jobs", async (req, res) => {
       try {
         const jobData = req.body;
+
         //  Validat the incoming job data using Joi
         const { error } = jobSchema.validate(jobData);
         if (error) {
-          res.status(400).send({ message: error.detail[0].message });
+          res.status(400).send({ message: error.details[0].message });
         }
 
         const result = await jobCollections.insertOne(jobData);
-        res.send(result);
+        return res.status(201).send(result);
       } catch (err) {
         console.error("Error saving job", err);
-        res.status(500).send({ message: "Failed to save job" });
+        return res.status(500).send({ message: "Failed to save job" });
+      }
+    });
+
+    // Route: Get All the Posted Data by specific User
+    app.get("/jobs/:email", async (req, res) => {
+      const email = req.params.email;
+      if (!email) return res.status(400).send({ message: "Email is required" });
+
+      try {
+        const query = { "buyer.email": email };
+        const result = await jobCollections.find(query).toArray();
+
+        res.status(200).send(result);
+      } catch (err) {
+        console.log("Error fetch in Job", err);
+        res.status(500).send({ message: "Failed to fetch job" });
       }
     });
 

@@ -27,9 +27,9 @@ const TabCategories = () => {
   const webDevelopment = jobs.filter(
     (job) => job.category === "Web Development"
   );
-  const graphic = jobs.filter((job) => job.category === "graphics design");
+  const graphic = jobs.filter((job) => job.category === "Graphics Design");
   const digitaMarketing = jobs.filter(
-    (job) => job.category === "digital marketing"
+    (job) => job.category === "Digital Marketing"
   );
 
   return (
