@@ -25,7 +25,7 @@ const TabCategories = () => {
 
   //  Filtering job based on category
   const webDevelopment = jobs.filter(
-    (job) => job.category === "web development"
+    (job) => job.category === "Web Development"
   );
   const graphic = jobs.filter((job) => job.category === "graphics design");
   const digitaMarketing = jobs.filter(

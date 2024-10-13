@@ -1,8 +1,8 @@
+import axios from "axios";
 import { useContext, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AuthContext } from "../provider/AuthProvider";
-import axios from "axios";
 
 const AddJob = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -21,7 +21,6 @@ const AddJob = () => {
 
     const jobData = {
       job_title,
-      email,
       deadline,
       category,
       max_price,
@@ -35,8 +34,15 @@ const AddJob = () => {
     };
     console.log(jobData);
 
-    try{
-        const {data}=await axios.post(`${import.meta.env.VITE_API_URL}/jobs`)
+    try {
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jobs`,
+        jobData
+      );
+      alert("successfully created a job");
+    } catch (error) {
+      console.log("Error in Posting Job", error.message);
+      alert("Failed to create the job. Please try again.");
     }
   };
 

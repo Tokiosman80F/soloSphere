@@ -53,13 +53,13 @@ const Navbar = () => {
               <Link to="/add-job">
                 <div className="justify-between">Add Job</div>
               </Link>
-              <Link>
+              <Link to="/myposted-jobs">
                 <div>My Posted Jobs</div>
               </Link>
-              <Link>
+              <Link to="/my-bids">
                 <div>My Bids</div>
               </Link>
-              <Link>
+              <Link to="/bid-requests">
                 <div>Bid Requests</div>
               </Link>
               <Link className="mt-2">

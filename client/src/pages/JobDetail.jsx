@@ -17,12 +17,12 @@ const JobDetails = () => {
     job_title,
     max_price,
     min_price,
-    buyer_email,
+    buyer,
   } = job;
 
   const handleBidFormSubmission = async (e) => {
     e.preventDefault();
-    if (user?.email === buyer_email) return alert("Access Denied");
+    if (user?.email === buyer?.email) return alert("Access Denied");
     const form = e.target;
     const job_id = _id;
     const user_price = parseFloat(form.price.value);
@@ -37,6 +37,7 @@ const JobDetails = () => {
     const user_email = user?.email;
     const status = "Pending";
     const user_deadline = startDate;
+    const buyer_email = buyer.email;
     const bidData = {
       job_id,
       user_price,
@@ -83,13 +84,15 @@ const JobDetails = () => {
           </p>
           <div className="flex items-center gap-5">
             <div>
-              <p className="mt-2 text-sm  text-gray-600 ">Name: Jhankar Vai.</p>
               <p className="mt-2 text-sm  text-gray-600 ">
-                Email: {buyer_email}
+                Name: {buyer?.name}.
+              </p>
+              <p className="mt-2 text-sm  text-gray-600 ">
+                Email: {buyer?.email}
               </p>
             </div>
             <div className="rounded-full object-cover overflow-hidden w-14 h-14">
-              <img src="" alt="" />
+              <img src={buyer?.photo} alt="" />
             </div>
           </div>
           <p className="mt-6 text-lg font-bold text-gray-600 ">
