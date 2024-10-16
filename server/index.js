@@ -122,6 +122,24 @@ async function run() {
         res.status(500).send({ message: "Failed to fetch job" });
       }
     });
+    // Route: Updating MyJob Post
+    app.patch("/job/:id", async (req, res) => {
+      const id = req.params.id;
+      if (!id)
+        return res
+          .status(400)
+          .send({ message: "Id not found while updating myJob post" }); // 400 means the server could not understand the request beacouse of invalid syntax
+      try {
+        const jobData = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = { $set: { ...jobData } };
+        const result = await jobCollections.updateOne(filter, updateDoc);
+        res.status(200).send(result);
+      } catch (err) {
+        console.log("Error in Updating MyPost job:", err);
+        res.status(500).send({ message: "Failed to fatch job" });
+      }
+    });
 
     // Test the MongoDB connection
     await client.db("admin").command({ ping: 1 });
