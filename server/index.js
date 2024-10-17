@@ -122,7 +122,7 @@ async function run() {
         res.status(500).send({ message: "Failed to fetch job" });
       }
     });
-    // Route: Updating MyJob Post
+    // Route: Edit MyJob Post
     app.patch("/job/:id", async (req, res) => {
       const id = req.params.id;
       if (!id)
@@ -131,13 +131,48 @@ async function run() {
           .send({ message: "Id not found while updating myJob post" }); // 400 means the server could not understand the request beacouse of invalid syntax
       try {
         const jobData = req.body;
+        //Ensure jobData is not Empty(no update sent)
+        if (!jobData || Object.keys(jobData).length === 0) {
+          return res
+            .status(400)
+            .send({ message: "No data provided for update" }); // 400 : Bad Request
+        }
         const filter = { _id: new ObjectId(id) };
         const updateDoc = { $set: { ...jobData } };
         const result = await jobCollections.updateOne(filter, updateDoc);
-        res.status(200).send(result);
+        if (result.matchedCount === 0) {
+          return res.status(404).send({ message: "Job not found" });
+        }
+
+        return res
+          .status(200)
+          .send({ message: "Job Updated Successfully", result }); // 200: Ok
       } catch (err) {
         console.log("Error in Updating MyPost job:", err);
-        res.status(500).send({ message: "Failed to fatch job" });
+        return res.status(500).send({ message: "Failed to fatch job" }); // 500: Internal Server Error
+      }
+    });
+
+    // Route : Deleting MyPost Job
+    app.delete("/job/:id", async (req, res) => {
+      const { id } = req.params;
+
+      //validating if the id is a valid objectId format
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ message: "Invalid Job ID formate" }); // 400: Bad Request
+      }
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await jobCollections.deleteOne(query);
+        if (result.deletedCount === 1) {
+          res.status(200).send({ message: "Job  Delete successfully", result });
+        } else {
+          res.status(404).send({ message: "Job not found" }); //404 : Not found
+        }
+      } catch (err) {
+        console.error("Error Deleting Job", err);
+        res.status(500).send({ message: "Failed to deleted job" }); //500: Internal Server Error
       }
     });
 
