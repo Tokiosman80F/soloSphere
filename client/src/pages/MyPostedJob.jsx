@@ -8,23 +8,35 @@ const MyPostedJobs = () => {
 
   console.log(user?.email);
 
+  const getData = async () => {
+    if (!user?.email) return;
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/jobs/${user?.email}`
+      );
+      setMyPostedJobs(data);
+    } catch (err) {
+      console.log("Error in MyPostedJob :", err.message);
+    }
+  };
+
   useEffect(() => {
-    const getData = async () => {
-      if (!user?.email) return;
-      try {
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/jobs/${user?.email}`
-        );
-        setMyPostedJobs(data);
-      } catch (err) {
-        console.log("Error in MyPostedJob :", err.message);
-      }
-    };
     getData();
   }, [user]);
 
-  console.log(myPostedJobs);
+  // console.log(myPostedJobs);
 
+  const handleEditMyJobPost = (id) => {
+    console.log("Edit :", id);
+  };
+  const handleDeleteMyJobPost = async (id) => {
+    console.log("Delete :", id);
+    const { data } = await axios.delete(
+      `${import.meta.env.VITE_API_URL}/job/${id}`
+    );
+    alert("successfully deleted");
+    getData();
+  };
   return (
     <section className="container px-4 mx-auto pt-12">
       <div className="flex items-center gap-x-3">
@@ -97,7 +109,7 @@ const MyPostedJobs = () => {
                       </td>
 
                       <td className="px-4 py-4 text-sm text-gray-500  whitespace-nowrap">
-                        {job.deadline}
+                        {new Date(job.deadline).toLocaleDateString()}
                       </td>
 
                       <td className="px-4 py-4 text-sm text-gray-500  whitespace-nowrap">
@@ -122,7 +134,11 @@ const MyPostedJobs = () => {
                       </td>
                       <td className="px-4 py-4 text-sm whitespace-nowrap">
                         <div className="flex items-center gap-x-6">
-                          <button className="text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none">
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => handleDeleteMyJobPost(job._id)}
+                            className="text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
@@ -138,8 +154,11 @@ const MyPostedJobs = () => {
                               />
                             </svg>
                           </button>
-
-                          <button className="text-gray-500 transition-colors duration-200   hover:text-yellow-500 focus:outline-none">
+                          {/* Update button  */}
+                          <button
+                            onClick={() => handleEditMyJobPost(job._id)}
+                            className="text-gray-500 transition-colors duration-200   hover:text-yellow-500 focus:outline-none"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
