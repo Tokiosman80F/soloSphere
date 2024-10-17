@@ -139,7 +139,8 @@ async function run() {
         }
         const filter = { _id: new ObjectId(id) };
         const updateDoc = { $set: { ...jobData } };
-        const result = await jobCollections.updateOne(filter, updateDoc);
+        const option={upsert:true}
+        const result = await jobCollections.updateOne(filter, updateDoc,option);
         if (result.matchedCount === 0) {
           return res.status(404).send({ message: "Job not found" });
         }
