@@ -1,13 +1,19 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
 import { googleSignIn } from "../../utilities/googleSignIn";
 
 const Registration = () => {
   const { authGoogleSignIn, authCreateUser, authUpdateProfile } =
     useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
 
-  const handleGoogleSignIn = () => googleSignIn(authGoogleSignIn);
+  const handleGoogleSignIn = () =>
+    googleSignIn(authGoogleSignIn).then(() => {
+      navigate(from, { replace: true });
+    });
 
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
@@ -25,7 +31,7 @@ const Registration = () => {
       //updating user profile with name and phot
       await authUpdateProfile(username, photo);
       console.log("User profile updated with name and photo");
-
+      navigate(from, { replace: true });
       return userCredential;
     } catch (error) {
       console.error("Failed to create user", error);

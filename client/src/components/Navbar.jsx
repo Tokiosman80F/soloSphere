@@ -27,9 +27,11 @@ const Navbar = () => {
             <Link to="/">Home</Link>
           </li>
 
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
+          {!user && (
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+          )}
         </ul>
         {user && (
           <div className="dropdown dropdown-end z-50">

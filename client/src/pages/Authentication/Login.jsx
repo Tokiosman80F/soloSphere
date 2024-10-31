@@ -1,15 +1,22 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
 import { googleSignIn } from "../../utilities/googleSignIn";
 
 const Login = () => {
   const { authGoogleSignIn, authSignInUser } = useContext(AuthContext);
 
-  // const form = useForm();
-  // const { register, control, handleSubmit } = form;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
 
-  const hangleGoogleSignIn = () => googleSignIn(authGoogleSignIn);
+  const hangleGoogleSignIn = () => {
+    googleSignIn(authGoogleSignIn).then(() => {
+      console.log("from:", from);
+
+      navigate(from, { replace: true });
+    });
+  };
 
   const handleLoginIn = async (e) => {
     e.preventDefault();
@@ -21,6 +28,7 @@ const Login = () => {
     try {
       const userCredential = await authSignInUser(email, pass);
       console.log("Successfully signedIn:", userCredential);
+      navigate(from, { replace: true });
       return userCredential;
     } catch (error) {
       console.error("Failed to create user:", error);
