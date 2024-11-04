@@ -1,10 +1,11 @@
+// zpQSeqVjHoWJhs1Z
 require("dotenv").config(); // Load environment variables
-const express = require("express"); // Import Express
-const cors = require("cors"); // Import CORS middleware
-const Joi = require("joi");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb"); // Import MongoDB client
+const express = require("express");
+const cors = require("cors");
+const Joi = require("joi"); //For schema validation
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
-const app = express(); // Initialize Express app
+const app = express();
 const port = process.env.PORT || 9001; // Define port from environment variables or fallback to 9001
 
 // Joi Schema For Validation of Job Data
@@ -22,6 +23,7 @@ const jobSchema = Joi.object({
   }).required(),
 });
 
+// Configure CORS option
 const corsOptions = {
   origin: ["http://localhost:5173"], // Allow requests from this origin
   credentials: true, // Allow credentials (cookies, headers)
@@ -32,7 +34,7 @@ const corsOptions = {
 app.use(express.json()); // Parse JSON request bodies
 app.use(cors(corsOptions)); // Enable CORS with specified options
 
-// MongoDB setup with proper URI format
+// MongoDB connection URL
 const uri = `mongodb+srv://${process.env.BUCKET}:${process.env.SECRET_BUCKET}@cluster0.lyiobzh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with Stable API version options
@@ -49,7 +51,7 @@ async function run() {
     const jobCollections = client.db("soloSphere").collection("jobs");
     const bidCollections = client.db("soloSphere").collection("bids");
 
-    //Route : Get All Jobs
+    // Fetch All Jobs
     app.get("/jobs", async (req, res) => {
       try {
         const result = await jobCollections.find().toArray();
@@ -60,7 +62,7 @@ async function run() {
       }
     });
 
-    // Route: Get a Signle Job by ID
+    // Fetch a Signle Job by ID
     app.get("/job/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -76,19 +78,7 @@ async function run() {
       }
     });
 
-    // Route: Save a Bid
-    app.post("/bids", async (req, res) => {
-      try {
-        const bidData = req.body;
-        const result = await bidCollections.insertOne(bidData);
-        res.send(result);
-      } catch (err) {
-        console.error("Error saving bid", err);
-        res.status(500).send({ message: "Failed to save bid" });
-      }
-    });
-
-    // Route: Save a Job with Validation
+    // Save a Job with Validation
     app.post("/jobs", async (req, res) => {
       try {
         const jobData = req.body;
@@ -106,8 +96,37 @@ async function run() {
         return res.status(500).send({ message: "Failed to save job" });
       }
     });
+    // Fetch all bids  by specific user
+    app.get("/mybids/:email", async (req, res) => {
+      const email = req.params.email;
+      if (!email)
+        return res.status(400).send({ message: "Email is required " });
+      try {
+        const query = { user_email: email };
+        const result = await bidCollections.find(query).toArray();
+        res.status(200).send(result);
+      } catch (err) {
+        console.log("Error fetchiing bids for user", err);
+        res.status(500).send({ message: "Failed to retrieve bids" }); // 500: Internal Error
+      }
+    });
 
-    // Route: Get All the Posted Data by specific User
+    //Fetch bids request by specific user
+    app.get("/bids-request/:email", async (req, res) => {
+      const email = req.params.email;
+      if (!email) return res.status(400).send({ message: "Email is required" }); // 400: Bad Request
+
+      try {
+        const query = { buyer_email: email };
+        const result = await bidCollections.find(query).toArray();
+        res.status(200).send(result);
+      } catch (err) {
+        console.log("Error Fetching bid request for user", err);
+        res.status(500).send({ message: "Failed to retrieve bid request" }); // 500: Internal Error
+      }
+    });
+
+    // Fetch All the Posted Data by specific User
     app.get("/jobs/:email", async (req, res) => {
       const email = req.params.email;
       if (!email) return res.status(400).send({ message: "Email is required" });
@@ -122,7 +141,7 @@ async function run() {
         res.status(500).send({ message: "Failed to fetch job" });
       }
     });
-    // Route: Edit MyJob Post
+    //  Edit MyJob Post
     app.patch("/job/:id", async (req, res) => {
       const id = req.params.id;
       if (!id)
@@ -139,8 +158,12 @@ async function run() {
         }
         const filter = { _id: new ObjectId(id) };
         const updateDoc = { $set: { ...jobData } };
-        const option={upsert:true}
-        const result = await jobCollections.updateOne(filter, updateDoc,option);
+        const option = { upsert: true };
+        const result = await jobCollections.updateOne(
+          filter,
+          updateDoc,
+          option
+        );
         if (result.matchedCount === 0) {
           return res.status(404).send({ message: "Job not found" });
         }
@@ -154,7 +177,7 @@ async function run() {
       }
     });
 
-    // Route : Deleting MyPost Job
+    //  Deleting MyPost Job
     app.delete("/job/:id", async (req, res) => {
       const { id } = req.params;
 
@@ -174,6 +197,20 @@ async function run() {
       } catch (err) {
         console.error("Error Deleting Job", err);
         res.status(500).send({ message: "Failed to deleted job" }); //500: Internal Server Error
+      }
+    });
+
+    //----- Route: Bid's -----
+
+    //  Save a Bid
+    app.post("/bids", async (req, res) => {
+      try {
+        const bidData = req.body;
+        const result = await bidCollections.insertOne(bidData);
+        res.send(result);
+      } catch (err) {
+        console.error("Error saving bid", err);
+        res.status(500).send({ message: "Failed to save bid" });
       }
     });
 
