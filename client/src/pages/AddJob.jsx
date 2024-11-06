@@ -5,8 +5,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import { AuthContext } from "../provider/AuthProvider";
 
 const AddJob = () => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date().toLocaleDateString());
   const { user } = useContext(AuthContext);
+  console.log("Started date:", startDate);
 
   const handleAddForm = async (e) => {
     e.preventDefault();

@@ -24,13 +24,23 @@ const MyBids = () => {
   }, [user]);
   console.log("My Bids:", myBids);
 
+  const handleStatus = async (id) => {
+    console.log("MyBids Job id:", id);
+    const { data } = await axios.patch(
+      `${import.meta.env.VITE_API_URL}/bids/${id}`,
+      { status: "Completed" }
+    );
+    console.log("My Bids Data:", data);
+    getData();
+  };
+
   return (
     <section className="container px-4 mx-auto pt-12">
       <div className="flex items-center gap-x-3">
         <h2 className="text-lg font-medium text-gray-800 ">My Bids</h2>
 
         <span className="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full ">
-          05 Bid
+          {myBids.length} Bid
         </span>
       </div>
 
@@ -121,15 +131,43 @@ const MyBids = () => {
                       </td>
 
                       <td className="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                        <div className="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-yellow-100/60 text-yellow-500">
-                          <span className="h-1.5 w-1.5 rounded-full bg-yellow-500"></span>
-                          <h2 className="text-sm font-normal ">{bid.status}</h2>
+                        <div
+                          className={`inline-flex items-center px-3 py-1 rounded-full gap-x-2
+      ${
+        bid.status === "In Progress"
+          ? "bg-blue-100/60 text-blue-500"
+          : bid.status === "Rejected"
+          ? "bg-red-100/60 text-red-500"
+          : bid.status === "Completed"
+          ? "bg-green-100/60 text-green-500"
+          : "bg-yellow-100/60 text-yellow-500"
+      }`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full
+        ${
+          bid.status === "In Progress"
+            ? "bg-blue-500"
+            : bid.status === "Rejected"
+            ? "bg-red-500"
+            : bid.status === "Completed"
+            ? "bg-green-500"
+            : "bg-yellow-500"
+        }`}
+                          ></span>
+                          <h2 className="text-sm font-normal">{bid.status}</h2>
                         </div>
                       </td>
+
                       <td className="px-4 py-4 text-sm whitespace-nowrap">
                         <button
+                          onClick={() => handleStatus(bid._id)}
                           title="Mark Complete"
                           className="text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none disabled:cursor-not-allowed"
+                          disabled={
+                            bid.status === "Pending" ||
+                            bid.status === "Rejected"
+                          }
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

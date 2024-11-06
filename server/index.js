@@ -96,35 +96,6 @@ async function run() {
         return res.status(500).send({ message: "Failed to save job" });
       }
     });
-    // Fetch all bids  by specific user
-    app.get("/mybids/:email", async (req, res) => {
-      const email = req.params.email;
-      if (!email)
-        return res.status(400).send({ message: "Email is required " });
-      try {
-        const query = { user_email: email };
-        const result = await bidCollections.find(query).toArray();
-        res.status(200).send(result);
-      } catch (err) {
-        console.log("Error fetchiing bids for user", err);
-        res.status(500).send({ message: "Failed to retrieve bids" }); // 500: Internal Error
-      }
-    });
-
-    //Fetch bids request by specific user
-    app.get("/bids-request/:email", async (req, res) => {
-      const email = req.params.email;
-      if (!email) return res.status(400).send({ message: "Email is required" }); // 400: Bad Request
-
-      try {
-        const query = { buyer_email: email };
-        const result = await bidCollections.find(query).toArray();
-        res.status(200).send(result);
-      } catch (err) {
-        console.log("Error Fetching bid request for user", err);
-        res.status(500).send({ message: "Failed to retrieve bid request" }); // 500: Internal Error
-      }
-    });
 
     // Fetch All the Posted Data by specific User
     app.get("/jobs/:email", async (req, res) => {
@@ -212,6 +183,48 @@ async function run() {
         console.error("Error saving bid", err);
         res.status(500).send({ message: "Failed to save bid" });
       }
+    });
+
+    // Fetch all bids  by specific user
+    app.get("/mybids/:email", async (req, res) => {
+      const email = req.params.email;
+      if (!email)
+        return res.status(400).send({ message: "Email is required " });
+      try {
+        const query = { user_email: email };
+        const result = await bidCollections.find(query).toArray();
+        res.status(200).send(result);
+      } catch (err) {
+        console.log("Error fetchiing bids for user", err);
+        res.status(500).send({ message: "Failed to retrieve bids" }); // 500: Internal Error
+      }
+    });
+
+    //Fetch bids request by specific user
+    app.get("/bids-request/:email", async (req, res) => {
+      const email = req.params.email;
+      if (!email) return res.status(400).send({ message: "Email is required" }); // 400: Bad Request
+
+      try {
+        const query = { buyer_email: email };
+        const result = await bidCollections.find(query).toArray();
+        res.status(200).send(result);
+      } catch (err) {
+        console.log("Error Fetching bid request for user", err);
+        res.status(500).send({ message: "Failed to retrieve bid request" }); // 500: Internal Error
+      }
+    });
+
+    // Updating bid status
+    app.patch("/bids/:id", async (req, res) => {
+      const id = req.params.id;
+      const status = req.body;
+      console.log(status);
+
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = { $set: status };
+      const result = await bidCollections.updateOne(filter, updateDoc);
+      res.send(result);
     });
 
     // Test the MongoDB connection
