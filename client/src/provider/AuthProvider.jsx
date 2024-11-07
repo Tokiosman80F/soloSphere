@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -127,7 +128,17 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
+      //signout the user from firebase
       await signOut(auth);
+
+      // Clearing token from cookies after signing out request
+      const { data } = await axios(`${import.meta.env.VITE_API_URL}/logout`, {
+        withCredentials: true,
+      });
+
+      if (!data.success) {
+        console.warn("Server did not acknowledge logout");
+      }
     } catch (error) {
       setError(error.message);
       console.error("Error in SignOut :", error);

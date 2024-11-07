@@ -26,13 +26,23 @@ const BidRequests = () => {
     console.log("Job id :", id);
     console.log("Job status :", prevStatus);
     console.log("New Job status :", newStatus);
-    if (prevStatus === newStatus) return alert("Action cannot be perform");
-    const { data } = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/bids/${id}`,
-      { status: newStatus }
-    );
-    console.log("Data is sent ==>", data);
-    getData();
+    if (prevStatus === newStatus)
+      return alert(
+        "Status change is not allowed: The new status is same as the current status"
+      );
+
+    try {
+      //send request to update status
+      const { data } = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/bids/${id}`,
+        { status: newStatus }
+      );
+      console.log("Data is sent ==>", data);
+      getData();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      alert("Error: Could not update bid status");
+    }
   };
 
   return (

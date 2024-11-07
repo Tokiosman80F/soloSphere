@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../provider/AuthProvider";
@@ -10,12 +11,27 @@ const Login = () => {
   const location = useLocation();
   const from = location.state?.from || "/";
 
-  const hangleGoogleSignIn = () => {
-    googleSignIn(authGoogleSignIn).then(() => {
+  const hangleGoogleSignIn = async () => {
+    try {
+      const result = await googleSignIn(authGoogleSignIn);
       console.log("from:", from);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jwt`,
+        {
+          email: result?.user?.email,
+        },
+        { withCredentials: true }
+      );
+      console.log("User email:", result);
 
+      console.log("Data", data);
+
+      // Redirecting user to intended page
       navigate(from, { replace: true });
-    });
+    } catch (err) {
+      console.error("Google sign in failed:", err);
+      alert("Authentication Failed.Please try again");
+    }
   };
 
   const handleLoginIn = async (e) => {
